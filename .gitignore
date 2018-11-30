@@ -1,7 +1,11 @@
 #ignore python cache files.
 *.pyc
 
+#ignore python virtual env
 venv
+
+#ignore node_modules
+node_modules
 
 *.log
 

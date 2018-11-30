@@ -12,18 +12,15 @@ class TD():
 
     account_details_frame_name = 'tddetails'
 
-    account_anchor_xpath = '//a[contains(@class, "td-link-standalone") and contains(.,%s)]'
+    account_anchor_xpath = '//a[contains(.,"%s")]'
 
-    cycle_selector_id = 'cycle' 
-    cycle_selector_options = [0,1,2,3,4,5,6] # 0 = current, 1 = last cycle, 2 = 2 cycles ago, 3 = etc
+    cycle_selector_id = 'cycles' 
+    cycle_selector_options = ['0','1','2','3','4','5','6'] # 0 = current, 1 = last cycle, 2 = 2 cycles ago, 3 = etc
 
     format_selector_id = 'downloadFormats'
     format_selector_options = ['DEF','OFC','OFX','QBO','CSV','ASO']
 
     download_transaction_button_xpath = '//a[contains(.,"Download")]'
-
-
-
 
     def get_login_page(self,service_name=DEFAULT_SERVICE,url=None):
 

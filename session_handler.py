@@ -1,3 +1,4 @@
+import os
 from selenium import webdriver
 from selenium.webdriver.firefox.options import Options
 from selenium.webdriver.common.by import By
@@ -17,19 +18,18 @@ class SessionHandler():
 
         self.bank_name = bank_name
         self.bank = TD()
-        self.set_browser_options()
 
     def set_browser_options(self):
         self.options = Options()
-        self.options.set_headless()
-        self.options.set_preference("browser.download.folderList",0)
+        self.options.set_preference("browser.download.folderList",2)
         self.options.set_preference("browser.download.manager.showWhenStarting", False)
-        self.options.set_preference("browser.download.dir","/data")
-
+        self.options.set_preference("browser.download.dir",os.path.join(os.path.dirname(os.path.realpath(__file__)),"data"))
+        self.options.set_preference("browser.download.useDownloadDir", True)
+        self.options.set_preference("browser.helperApps.neverAsk.saveToDisk", "text/csv,application/csv,text/plan,text/comma-separated-values,application/octet-stream")
+    
     def start_session(self):
-        #self.driver = webdriver.Firefox(firefox_options=self.options)
-        #self.driver = webdriver.Chrome()
-        self.driver = webdriver.Firefox()
+        self.set_browser_options()
+        self.driver = webdriver.Firefox(firefox_options=self.options)
         print("Session Started")
 
     def close_session(self):
@@ -65,7 +65,7 @@ class SessionHandler():
             self.driver.close()
             return
 
-    def retrieve_transactions_for(self,key_word=None,cycle_to_retrieve=0,format_to_retrieve='CSV'):
+    def retrieve_transactions_for(self,key_word=None,cycle_to_retrieve="0",format_to_retrieve="CSV"):
         if (cycle_to_retrieve not in self.bank.cycle_selector_options):
             print(f'Your bank only supports the cycle options {self.bank.cycle_selector_options}')
             return
@@ -75,30 +75,27 @@ class SessionHandler():
             return
 
         #select page to view statements
-        try:
-            WebDriverWait(self.driver,10).until(EC.frame_to_be_available_and_switch_to_it((By.NAME,self.bank.account_details_frame_name)))
-            anchor_link = WebDriverWait(self.driver, 10).until(EC.presence_of_element_located((By.XPATH, self.bank.account_anchor_xpath % key_word)))
-            #anchor_link = WebDriverWait(self.driver, 10).until(EC.element_to_be_clickable((By.XPATH, f'//a[contains(.,{key_word})]')))
-            anchor_link.click()
-        except TimeoutException:
-            print(self.driver.current_url)
-            print(self.driver.page_source)
-            return
+        print("Clicking Account Link")
+        WebDriverWait(self.driver,10).until(EC.frame_to_be_available_and_switch_to_it((By.NAME,self.bank.account_details_frame_name)))
+        anchor_link = WebDriverWait(self.driver, 10).until(EC.presence_of_element_located((By.XPATH, self.bank.account_anchor_xpath % key_word)))
+        anchor_link.click()
+
+        #reset the driver context.
+        self.driver.switch_to.default_content()
 
         #select the cycle you'd like to view.
-        try:
-            cycle_selector = WebDriverWait(self.driver, 10).until(EC.presence_of_element_located((By.ID, self.bank.cycle_selector_id)))
-            Select(cycle_selector).select_by_value(cycle_to_retrieve).click()
-        except TimeoutException:
-            print(self.driver.current_url)
-            print(self.driver.page_source)
-            return
-
+        print('Selecting cycle')
+        cycle_selector = WebDriverWait(self.driver, 10).until(EC.presence_of_element_located((By.ID, self.bank.cycle_selector_id)))
+        WebDriverWait(self.driver,10).until(EC.presence_of_element_located((By.CSS_SELECTOR, f'option[value="{cycle_to_retrieve}"]')))
+        Select(cycle_selector).select_by_value(cycle_to_retrieve)
+        
         #select the format you'd like to have.
+        print('Selecting format of data')
         format_selector = WebDriverWait(self.driver, 10).until(EC.presence_of_element_located((By.ID, self.bank.format_selector_id)))
-        Select(format_selector).select_by_value(format_to_retrieve).click()
-
+        Select(format_selector).select_by_value(format_to_retrieve)
+        
         #download the file.
-
+        print('Downloading selected data')
         download_button = WebDriverWait(self.driver, 10).until(EC.presence_of_element_located((By.XPATH, self.bank.download_transaction_button_xpath)))
         download_button.click()
+        
