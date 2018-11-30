@@ -1,5 +1,6 @@
 #ignore python cache files.
 *.pyc
+.ipynb_checkpoints
 
 #ignore python virtual env
 venv
@@ -12,5 +13,8 @@ node_modules
 #this file contains my info :S
 test_connection.py
 
-#ignore my editor settings.
+#ignore my editor settings
 .vscode
+
+#ignore the data collected
+data
