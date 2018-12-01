@@ -79,11 +79,16 @@ class AMEX():
 
         return driver
 
-    def select_cycle_to_download(self,driver):
-        latest = WebDriverWait(driver, 10).until(EC.presence_of_element_located((By.ID, 'radioid00')))
-        last_month = WebDriverWait(driver, 10).until(EC.presence_of_element_located((By.ID, 'radioid01')))
-        latest.click()
-        last_month.click()
+    def select_cycle_to_download(self,driver,cycle_index=None):
+        if (cycle_index == None):
+            print(f'You didn\'t select a cycle to download, your banks supports multi_select={self.cycle_mutli_select} and options={self.cycle_selector_options} and we\'ve defaulted to {self.cycle_selector_options[0]} )')
+            cycle_index = [self.cycle_selector_options[0]]
+
+        elements = [WebDriverWait(driver, 10).until(EC.presence_of_element_located((By.ID, ci))) for ci in cycle_index]
+        
+        for element in elements:
+            element.click()
+
         download = WebDriverWait(driver, 10).until(EC.presence_of_element_located((By.XPATH, '//a[contains(.,"Download Now")]')))
         download.click()
         return driver

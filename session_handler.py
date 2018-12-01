@@ -45,7 +45,7 @@ class SessionHandler():
         self.driver = self.bank.login(self.driver, selection_params=service_name, user_name=user_name, password=password)
 
     def retrieve_transactions_for(self,key_word=None,cycle_to_retrieve=None,format_to_retrieve="CSV"):
-        self.driver = self.bank.navigate_to_downloads(self.driver,account_selector=key_word)
-        self.driver = self.bank.select_cycle_to_download(self.driver)
+        self.driver = self.bank.navigate_to_downloads(self.driver,account_selector=key_word,data_format=format_to_retrieve)
+        self.driver = self.bank.select_cycle_to_download(self.driver,cycle_index=cycle_to_retrieve)
         self.close_session()
         
