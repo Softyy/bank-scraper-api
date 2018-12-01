@@ -68,24 +68,31 @@ class AMEX():
             print(f'The data format {data_format} isn\'t supported, AMEX only takes {self.format_selector_options}')
             return driver
 
+        if (account_selector is not None):
+            print('AMEX has an ancient interface for this, this tool expects an ID in the form "selectCardXX"')
+            if 'selectCard' not in account_selector:
+                print(f'key_word {account_selector} doesn\'t meet amex style.')
+                driver.close()
+                return
+
         statement_button = WebDriverWait(driver, 10).until(EC.presence_of_element_located((By.XPATH, '//button[@title="Statement"]')))
         statement_button.click()
         anchor_link = WebDriverWait(driver, 10).until(EC.presence_of_element_located((By.XPATH, '//a[@title="Export Statement Data"]')))
         anchor_link.click()
         radio = WebDriverWait(driver, 10).until(EC.presence_of_element_located((By.ID, data_format)))
         radio.click()
-        input_download = WebDriverWait(driver, 10).until(EC.presence_of_element_located((By.ID, 'selectCard10')))
+        input_download = WebDriverWait(driver, 10).until(EC.presence_of_element_located((By.ID, account_selector)))
         input_download.click()
 
         return driver
 
     def select_cycle_to_download(self,driver,cycle_index=None):
         if (cycle_index == None):
-            print(f'You didn\'t select a cycle to download, your banks supports multi_select={self.cycle_mutli_select} and options={self.cycle_selector_options} and we\'ve defaulted to {self.cycle_selector_options[0]} )')
+            print(f'You didn\'t select a cycle to download, your banks supports multi_select={self.cycle_mutli_select} and options={self.cycle_selector_options} and we\'ve defaulted to {self.cycle_selector_options[0]}')
             cycle_index = [self.cycle_selector_options[0]]
 
         elements = [WebDriverWait(driver, 10).until(EC.presence_of_element_located((By.ID, ci))) for ci in cycle_index]
-        
+
         for element in elements:
             element.click()
 
