@@ -1,6 +1,6 @@
 astroid==2.1.0
 backcall==0.1.0
-bleach==3.0.2
+bleach==3.1.4
 colorama==0.4.1
 decorator==4.3.0
 defusedxml==0.5.0
